@@ -1,0 +1,17 @@
+.local
+.output.js
+.husky
+.vscode
+.idea
+jsconfig.json
+tsconfig.json
+
+**/*.svg
+**/*.sh
+
+/public/**
+/node_modules/**
+/dist/**
+/docs/**
+/bin/**
+/src/lib/**

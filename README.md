@@ -20,7 +20,7 @@
 
 tsconfig 配置文件中添加对应的类型
 
-```json
+```json5
 // tsconfig.json
 {
   "types": ["jest"]
@@ -29,7 +29,7 @@ tsconfig 配置文件中添加对应的类型
 
 5. 添加测试命令
 
-```json
+```json5
 // package.json
 {
   "scripts": {
@@ -42,7 +42,7 @@ tsconfig 配置文件中添加对应的类型
 
 6. 关闭参数不写类型时 ts 的隐藏 any 类型错误
 
-```json
+```json5
 // tsconfig.json
 {
   "noImplicitAny": false

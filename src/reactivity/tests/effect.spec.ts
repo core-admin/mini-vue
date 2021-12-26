@@ -19,22 +19,22 @@ describe('effect', () => {
     user.age++;
 
     expect(nextAge).toBe(12);
+  });
 
-    // const obj = reactive({ count: 1 });
-    // let step = 0;
-    // let step2 = 1;
-    // const obj2 = reactive({ count: 10 });
+  it('', () => {
+    // effect(fn) 执行 会返回一个函数 runner => {}
+    // 当调用 runner这个方法时 会再次执行传递给effect的fn
+    // 当调用runner执行fn时，它会把fn的执行结构return出去
+    // 也就是说 当调用runner时，可以拿到fn的返回值
 
-    // effect(() => {
-    //   step = obj.count;
-    //   step = obj2.count;
-    //   console.log(1);
-    // });
-
-    // effect(() => {
-    //   obj2.count = 2;
-    //   console.log(2);
-    // });
-    // console.log('step', step);
+    let foo = 10;
+    const runner = effect(() => {
+      foo++;
+      return 'foo';
+    });
+    expect(foo).toBe(11);
+    const r = runner();
+    expect(foo).toBe(12);
+    expect(r).toBe('foo');
   });
 });

@@ -11,7 +11,7 @@ class ReactiveEffect {
   run() {
     // 当存在多个effect函数调用时，activeEffect的值重新赋值为this，可以防止在effect回调函数多次执行track收集的函数始终是正确的
     activeEffect = this;
-    this._fn();
+    return this._fn();
   }
 }
 
@@ -55,6 +55,8 @@ export function effect(fn: () => void) {
   const _effect = new ReactiveEffect(fn);
 
   _effect.run();
+
+  return _effect.run.bind(_effect);
 }
 
 /*

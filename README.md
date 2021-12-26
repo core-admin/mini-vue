@@ -20,21 +20,21 @@
 
 tsconfig 配置文件中添加对应的类型
 
-```json5
+```javascript
 // tsconfig.json
 {
-  "types": ["jest"]
+  "types": ["jest"],
 }
 ```
 
 5. 添加测试命令
 
-```json5
+```javascript
 // package.json
 {
   "scripts": {
-    "test": "jest"
-  }
+    "test": "jest",
+  },
 }
 ```
 
@@ -42,10 +42,10 @@ tsconfig 配置文件中添加对应的类型
 
 6. 关闭参数不写类型时 ts 的隐藏 any 类型错误
 
-```json5
+```javascript
 // tsconfig.json
 {
-  "noImplicitAny": false
+  "noImplicitAny": false,
 }
 ```
 
@@ -76,4 +76,15 @@ module.exports = {
 module.exports = {
   presets: [['@babel/preset-env', { targets: { node: 'current' } }], '@babel/preset-typescript'],
 };
+```
+
+8. 添加 es 语法支持在 ts 中
+
+```javascript
+{
+  // 将代码转成es6，输出成较低的es，在调试时降级代码太多不方便查看
+  "target": "es6",
+  // 制定目标运行时的环境
+  "lib": ["DOM", "ESNext"]
+}
 ```

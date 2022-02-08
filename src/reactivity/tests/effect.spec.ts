@@ -2,7 +2,7 @@ import { reactive } from '../reactive';
 import { effect } from '../effect';
 
 describe('effect', () => {
-  it('happy path', () => {
+  it('1.effect回调函数中的响应式变量应该能在外部修改时重新执行', () => {
     const user = reactive({
       age: 10,
     });
@@ -21,11 +21,12 @@ describe('effect', () => {
     expect(nextAge).toBe(12);
   });
 
-  it('', () => {
-    // effect(fn) 执行 会返回一个函数 runner => {}
-    // 当调用 runner这个方法时 会再次执行传递给effect的fn
-    // 当调用runner执行fn时，它会把fn的执行结构return出去
-    // 也就是说 当调用runner时，可以拿到fn的返回值
+  it('2.实现effect返回runner函数', () => {
+    /**
+     * effect 函数指定应该有一个返回值 返回值是一个函数 runner
+     * 当调用runner函数时，effect的参数fn函数应该被执行
+     * runner的执行结果应该是 fn的返回值
+     */
 
     let foo = 10;
     const runner = effect(() => {

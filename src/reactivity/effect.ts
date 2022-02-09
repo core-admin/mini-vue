@@ -9,6 +9,7 @@ class ReactiveEffect {
   // deps: any[] = [];
   deps = new Set<any>();
   active = true;
+  onStop?: () => void;
 
   constructor(_fn: Fn, public scheduler?: Fn) {
     this._fn = _fn;
@@ -25,6 +26,9 @@ class ReactiveEffect {
     if (this.active) {
       // stop 即：将收集的deps清空
       clearupEffect(this);
+      if (this.onStop) {
+        this.onStop();
+      }
       this.active = false;
     }
   }
@@ -94,6 +98,7 @@ export function stop(runner) {
 export function effect(fn: () => void, options: any = {}) {
   // 存储effect回调函数的容器类
   const _effect = new ReactiveEffect(fn, options.scheduler);
+  _effect.onStop = options.onStop;
 
   _effect.run();
 

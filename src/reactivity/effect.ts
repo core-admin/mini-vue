@@ -1,3 +1,6 @@
+// shaded 模块是 所有模块下的通用工具函数
+import { extend } from '../shared/index';
+
 let activeEffect;
 
 type Fn<T = any> = () => T;
@@ -63,16 +66,21 @@ export function track(target, key) {
     targetMapValue.set(key, dep);
   }
 
+  // 只有effect调用时 activeEffect才会存在
+  if (!activeEffect) {
+    return;
+  }
+
   // dep对应Set 而Set身上存储的是ReactiveEffect的实例
   dep.add(activeEffect);
 
   // 反向收集依赖 供ReactiveEffect实例的stop方法调用 方便获取收集到的dep
-  // 只有effect调用时 activeEffect才会存在
   // activeEffect -> ReactiveEffect的实例
 
   // activeEffect && activeEffect.deps.push(dep);
+
   // 优化 当deps是一个数组时，进行收集dep 会存在多次收集相同的dep 浪费空间
-  activeEffect && activeEffect.deps.add(dep);
+  activeEffect.deps.add(dep);
 }
 
 // setter 修改值时 触发依赖
@@ -98,6 +106,24 @@ export function stop(runner) {
 export function effect(fn: () => void, options: any = {}) {
   // 存储effect回调函数的容器类
   const _effect = new ReactiveEffect(fn, options.scheduler);
+
+  // options
+  extend(_effect, options);
+
+  _effect.run();
+
+  const runner: any = _effect.run.bind(_effect);
+
+  // 将_effect挂载到runner函数上，以供stop调用时能拿到当前的effect实例
+  runner.effect = _effect;
+
+  return runner;
+}
+
+/*
+export function effect(fn: () => void, options: any = {}) {
+  // 存储effect回调函数的容器类
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.onStop = options.onStop;
 
   _effect.run();
@@ -109,6 +135,7 @@ export function effect(fn: () => void, options: any = {}) {
 
   return runner;
 }
+*/
 
 /*
   target = { count: 1 }

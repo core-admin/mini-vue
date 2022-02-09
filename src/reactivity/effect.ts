@@ -6,6 +6,10 @@ class ReactiveEffect {
   // effect 的回调函数 由用户传递进来
   private _fn: Fn;
 
+  // deps: any[] = [];
+  deps = new Set<any>();
+  active = true;
+
   constructor(_fn: Fn, public scheduler?: Fn) {
     this._fn = _fn;
   }
@@ -15,6 +19,21 @@ class ReactiveEffect {
     activeEffect = this;
     return this._fn();
   }
+
+  stop() {
+    // 多次调用stop时只清空一次即可
+    if (this.active) {
+      // stop 即：将收集的deps清空
+      clearupEffect(this);
+      this.active = false;
+    }
+  }
+}
+
+function clearupEffect(effect) {
+  // 删除收集到的dep中存储的effect函数（effect -> fn）delete 删除指定项 此处并不是清空dep中的Size对象中的数据，如果清空就相当于多个effect函数执行了stop，就不符合stop针对单个effect函数了
+  // 需要先找到对应的dep
+  effect.deps.forEach(dep => dep.delete(effect));
 }
 
 // 存储依赖的容器 target -> key -> dep
@@ -40,7 +59,16 @@ export function track(target, key) {
     targetMapValue.set(key, dep);
   }
 
+  // dep对应Set 而Set身上存储的是ReactiveEffect的实例
   dep.add(activeEffect);
+
+  // 反向收集依赖 供ReactiveEffect实例的stop方法调用 方便获取收集到的dep
+  // 只有effect调用时 activeEffect才会存在
+  // activeEffect -> ReactiveEffect的实例
+
+  // activeEffect && activeEffect.deps.push(dep);
+  // 优化 当deps是一个数组时，进行收集dep 会存在多次收集相同的dep 浪费空间
+  activeEffect && activeEffect.deps.add(dep);
 }
 
 // setter 修改值时 触发依赖
@@ -58,13 +86,21 @@ export function trigger(target, key) {
   }
 }
 
+// stop的调用，就是将收集的effect函数删除掉
+export function stop(runner) {
+  runner.effect.stop();
+}
+
 export function effect(fn: () => void, options: any = {}) {
   // 存储effect回调函数的容器类
   const _effect = new ReactiveEffect(fn, options.scheduler);
 
   _effect.run();
 
-  const runner = _effect.run.bind(_effect);
+  const runner: any = _effect.run.bind(_effect);
+
+  // 将_effect挂载到runner函数上，以供stop调用时能拿到当前的effect实例
+  runner.effect = _effect;
 
   return runner;
 }
@@ -90,4 +126,8 @@ export function effect(fn: () => void, options: any = {}) {
     // ...
     // ...
   }
+
+  obj -> key -> dep -> Set(fn1, fn2, fn3...)
+
+  stop 执行 应该先取到对应的dep中的Set对象，然后删除Set中存储的dep
 */

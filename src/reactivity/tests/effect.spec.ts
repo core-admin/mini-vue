@@ -1,5 +1,5 @@
 import { reactive } from '../reactive';
-import { effect } from '../effect';
+import { effect, stop } from '../effect';
 
 describe('effect', () => {
   it('1.effect回调函数中的响应式变量应该能在外部修改时重新执行', () => {
@@ -88,5 +88,75 @@ describe('effect', () => {
     expect(dummy).toBe(2);
 
     expect(scheduler).toHaveBeenCalledTimes(1);
+  });
+
+  it('stop', () => {
+    let dummy;
+    const obj = reactive({
+      prop: 1,
+    });
+    const runner = effect(() => {
+      dummy = obj.prop;
+    });
+
+    obj.prop = 2;
+    expect(dummy).toBe(2);
+
+    // 调用stop功能后，当再次修改obj里的值，effect函数将不会在更新
+    stop(runner);
+
+    obj.prop = 3;
+    expect(dummy).toBe(2);
+
+    runner();
+    expect(dummy).toBe(3);
+  });
+
+  // 测试stop函数的执行是否影响到了其他effect函数
+  it('stop2', () => {
+    let dummy;
+    let dummy2;
+    const obj = reactive({
+      prop: 1,
+    });
+    const runner = effect(() => {
+      dummy = obj.prop;
+    });
+
+    effect(() => {
+      dummy2 = obj.prop;
+    });
+
+    obj.prop = 2;
+    expect(dummy).toBe(2);
+    expect(dummy2).toBe(2);
+
+    // 调用stop功能后，当再次修改obj里的值，effect函数将不会在更新
+    stop(runner);
+
+    obj.prop = 3;
+    expect(dummy).toBe(2);
+    expect(dummy2).toBe(3);
+
+    runner();
+    expect(dummy).toBe(3);
+  });
+
+  it('stop3 测试deps重复）', () => {
+    // 反向收集dep时（在track时往ReactiveEffect的实例属性deps上收集dep）使用数组的方式存在多次收集相当的dep
+    let dummy;
+    const obj = reactive({
+      prop: 1,
+    });
+    effect(() => {
+      dummy = obj.prop;
+    });
+
+    obj.prop++;
+    obj.prop++;
+    obj.prop++;
+    obj.prop++;
+    obj.prop++;
+    expect(dummy).toBe(6);
   });
 });

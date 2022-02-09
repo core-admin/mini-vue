@@ -1,10 +1,12 @@
 let activeEffect;
 
+type Fn<T = any> = () => T;
+
 class ReactiveEffect {
   // effect 的回调函数 由用户传递进来
-  private _fn: () => void;
+  private _fn: Fn;
 
-  constructor(_fn: () => void) {
+  constructor(_fn: Fn, public scheduler?: Fn) {
     this._fn = _fn;
   }
 
@@ -45,18 +47,26 @@ export function track(target, key) {
 export function trigger(target, key) {
   let targetMapValue = targetMaps.get(target);
   let dep = targetMapValue.get(key);
-  for (const effectCbFn of dep) {
-    effectCbFn.run();
+
+  // effect -> ReactiveEffect
+  for (const effect of dep) {
+    if (effect.scheduler) {
+      effect.scheduler();
+    } else {
+      effect.run();
+    }
   }
 }
 
-export function effect(fn: () => void) {
+export function effect(fn: () => void, options: any = {}) {
   // 存储effect回调函数的容器类
-  const _effect = new ReactiveEffect(fn);
+  const _effect = new ReactiveEffect(fn, options.scheduler);
 
   _effect.run();
 
-  return _effect.run.bind(_effect);
+  const runner = _effect.run.bind(_effect);
+
+  return runner;
 }
 
 /*

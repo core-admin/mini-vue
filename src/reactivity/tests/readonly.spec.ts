@@ -15,4 +15,20 @@ describe('readonly', () => {
     expect(wrapped).not.toBe(original);
     expect(wrapped.foo).toBe(1);
   });
+
+  // 修改readonly创建的属性值值提示警告信息
+  it('warn then call set', () => {
+    // console.warn('xxx');
+    // mock 构建一个假的警告方法
+    // jest.fn() 会创建一个函数
+    console.warn = jest.fn();
+
+    const user = readonly({
+      age: 20,
+    });
+    user.age = 21;
+    // 验证其警告函数是否被调用
+    // toBeCalled 验证其调用次数 >= 1
+    expect(console.warn).toBeCalled();
+  });
 });

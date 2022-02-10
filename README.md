@@ -88,3 +88,5 @@ module.exports = {
   "lib": ["DOM", "ESNext"]
 }
 ```
+
+TDD: 先写测试代码，然后让测试用例通过，最后在重构优化代码。

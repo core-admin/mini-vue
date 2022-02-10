@@ -20,3 +20,14 @@ export function reactive(raw) {
     },
   });
 }
+
+export function readonly(raw) {
+  return new Proxy(raw, {
+    get(target, key) {
+      return Reflect.get(target, key);
+    },
+    set() {
+      return false;
+    },
+  });
+}

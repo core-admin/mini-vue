@@ -2,6 +2,7 @@ import { mutableHandles, readonlyHandles } from './baseHandlers';
 
 export const enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
+  IS_READONLY = '__v_isReadonly',
 }
 
 export function reactive(raw) {
@@ -20,4 +21,8 @@ export function isReactive(value) {
   // 取值时触发 reactive的get方法
   // 当访问一个被reactive包装过的对象身上不存在的属性时 get将不会被调用
   return !!value[ReactiveFlags.IS_REACTIVE];
+}
+
+export function isReadonly(value) {
+  return !!value[ReactiveFlags.IS_READONLY];
 }

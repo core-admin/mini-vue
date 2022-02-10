@@ -1,4 +1,4 @@
-import { readonly } from '../reactive';
+import { readonly, isReadonly } from '../reactive';
 
 describe('readonly', () => {
   // 程序主逻辑
@@ -30,5 +30,12 @@ describe('readonly', () => {
     // 验证其警告函数是否被调用
     // toBeCalled 验证其调用次数 >= 1
     expect(console.warn).toBeCalled();
+  });
+
+  it('isReadonly', () => {
+    const original = { foo: 1 };
+    const wrapped = readonly(original);
+    expect(isReadonly(wrapped)).toBe(true);
+    expect(isReadonly(original)).toBe(false);
   });
 });

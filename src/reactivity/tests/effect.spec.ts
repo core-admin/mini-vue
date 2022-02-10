@@ -142,23 +142,23 @@ describe('effect', () => {
     expect(dummy).toBe(3);
   });
 
-  it('stop3 测试deps重复）', () => {
-    // 反向收集dep时（在track时往ReactiveEffect的实例属性deps上收集dep）使用数组的方式存在多次收集相当的dep
-    let dummy;
-    const obj = reactive({
-      prop: 1,
-    });
-    effect(() => {
-      dummy = obj.prop;
-    });
+  // it('stop3 测试deps重复）', () => {
+  //   // 反向收集dep时（在track时往ReactiveEffect的实例属性deps上收集dep）使用数组的方式存在多次收集相当的dep
+  //   let dummy;
+  //   const obj = reactive({
+  //     prop: 1,
+  //   });
+  //   effect(() => {
+  //     dummy = obj.prop;
+  //   });
 
-    obj.prop++;
-    obj.prop++;
-    obj.prop++;
-    obj.prop++;
-    obj.prop++;
-    expect(dummy).toBe(6);
-  });
+  //   obj.prop++;
+  //   obj.prop++;
+  //   obj.prop++;
+  //   obj.prop++;
+  //   obj.prop++;
+  //   expect(dummy).toBe(6);
+  // });
 
   // 调用stop的回调函数
   it('onStop', () => {

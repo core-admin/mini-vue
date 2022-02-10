@@ -9,8 +9,8 @@ class ReactiveEffect {
   // effect 的回调函数 由用户传递进来
   private _fn: Fn;
 
-  // deps: any[] = [];
-  deps = new Set<any>();
+  // deps = new Set<any>();
+  deps: any[] = [];
   active = true;
   onStop?: () => void;
 
@@ -80,7 +80,10 @@ export function track(target, key) {
   // activeEffect && activeEffect.deps.push(dep);
 
   // 优化 当deps是一个数组时，进行收集dep 会存在多次收集相同的dep 浪费空间
-  activeEffect.deps.add(dep);
+  // activeEffect.deps.add(dep);
+
+  // 不在优化：引用【1】
+  activeEffect && activeEffect.deps.push(dep);
 }
 
 // setter 修改值时 触发依赖
@@ -163,3 +166,18 @@ export function effect(fn: () => void, options: any = {}) {
 
   stop 执行 应该先取到对应的dep中的Set对象，然后删除Set中存储的dep
 */
+
+/*
+  引用【1】：
+    说明：之前deps的收集使用了Array集合，而后发现会收集很多次重复的数据故改成了Set，现在又改回来了故对以上操作做出说明
+
+    就当前实现的逻辑来看用 Set 也 ok
+
+    不过性能上 array 要比 set 更快
+
+    （这个是性能比较的文章： https://stackoverflow.com/questions/39007637/javascript-set-vs-array-performance）
+
+    在 vue3 源码中 ，很多的实现都特别注重性能
+
+    而且在源码里面是需要获取 deps 的某个索引的， 用 set 的话就不行了
+ */

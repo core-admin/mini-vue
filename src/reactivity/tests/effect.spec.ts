@@ -105,7 +105,21 @@ describe('effect', () => {
     // 调用stop功能后，当再次修改obj里的值，effect函数将不会在更新
     stop(runner);
 
-    obj.prop = 3;
+    console.log(1);
+
+    // obj.prop = 3;
+
+    /**
+     * 此处由 obj.prop = 3 改为了 obj.prop++ 发现当前的测试用例不通过了
+     * 因为 当执行stop操作时会清空tack收集的依赖函数，obj.prop = 3 修改值时 依赖函数以被清空，而 obj.prop++ 是会先触发get 然后 set触发，然后 依赖函数被调用
+     *
+     * obj.prop++ -> obj.prop = obj.prop + 1
+     *
+     * 意味着stop白白执行了（清空了但又收集了）
+     */
+
+    obj.prop++;
+    // 解决方法 即便stop执行后访问get时会继续收集依赖，我们只要保证，在set时fn函数不会被调用即可
     expect(dummy).toBe(2);
 
     runner();

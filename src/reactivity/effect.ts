@@ -3,6 +3,14 @@ import { extend } from '../shared/index';
 
 let activeEffect;
 
+// 是否应该收集依赖 其实只有运用effect函数和收集的依赖才有用 因为set时会调用收集的fn
+// 默认不收集 只有effect函数执行时才会把当前状态改成true（此时应该收集依赖）
+// 也就是说 track收集依赖的场景适应于 effect被使用的情况下，因为只使用reactive时访问属性被get然后收集依赖是没必要的，收集的依赖就是effect传入的fn
+
+// 当执行stop后，访问reactive包装过的属性时不应该再次收集依赖了（shouldTrack = false）
+// stop后，每次去修改属性时即便先get 也不会收集了
+let shouldTrack;
+
 type Fn<T = any> = () => T;
 
 class ReactiveEffect {
@@ -19,9 +27,19 @@ class ReactiveEffect {
   }
 
   run() {
+    // active = false 执行了stop方法
+    if (!this.active) {
+      // 当stop后 直接调用runner让fn执行，也不会打开shouldTrack，重新收集依赖 只是让fn执行而已
+      return this._fn();
+    }
+
+    shouldTrack = true;
+
     // 当存在多个effect函数调用时，activeEffect的值重新赋值为this，可以防止在effect回调函数多次执行track收集的函数始终是正确的
     activeEffect = this;
-    return this._fn();
+    const result = this._fn();
+    shouldTrack = false;
+    return result;
   }
 
   stop() {
@@ -41,6 +59,9 @@ function clearupEffect(effect) {
   // 删除收集到的dep中存储的effect函数（effect -> fn）delete 删除指定项 此处并不是清空dep中的Size对象中的数据，如果清空就相当于多个effect函数执行了stop，就不符合stop针对单个effect函数了
   // 需要先找到对应的dep
   effect.deps.forEach(dep => dep.delete(effect));
+
+  // 把 effect.deps 清空
+  effect.deps.length = 0;
 }
 
 // 存储依赖的容器 target -> key -> dep
@@ -68,6 +89,11 @@ export function track(target, key) {
 
   // 只有effect调用时 activeEffect才会存在
   if (!activeEffect) {
+    return;
+  }
+
+  // 用来控制是否需要收集依赖
+  if (!shouldTrack) {
     return;
   }
 

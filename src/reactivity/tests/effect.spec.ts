@@ -105,8 +105,6 @@ describe('effect', () => {
     // 调用stop功能后，当再次修改obj里的值，effect函数将不会在更新
     stop(runner);
 
-    console.log(1);
-
     // obj.prop = 3;
 
     /**

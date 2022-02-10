@@ -67,8 +67,30 @@ function clearupEffect(effect) {
 // 存储依赖的容器 target -> key -> dep
 const targetMaps = new Map();
 
+function isTracking() {
+  // ------ 一版 ----------
+
+  // 只有effect调用时 activeEffect才会存在
+  // if (!activeEffect) {
+  //   return false;
+  // }
+
+  // // 用来控制是否需要收集依赖
+  // if (!shouldTrack) {
+  //   return false;
+  // }
+
+  // --------- 二版 ---------
+
+  return shouldTrack && activeEffect !== undefined;
+}
+
 // getter 访问值时 收集依赖
 export function track(target, key) {
+  if (!isTracking()) {
+    return;
+  }
+
   // target -> key -> dep
   let targetMapValue = targetMaps.get(target);
   // 初始化时是不存在的 需要创建
@@ -87,13 +109,8 @@ export function track(target, key) {
     targetMapValue.set(key, dep);
   }
 
-  // 只有effect调用时 activeEffect才会存在
-  if (!activeEffect) {
-    return;
-  }
-
-  // 用来控制是否需要收集依赖
-  if (!shouldTrack) {
+  // 看看 dep 之前有没有添加过，添加过的话 那么就不添加了
+  if (dep.has(activeEffect)) {
     return;
   }
 

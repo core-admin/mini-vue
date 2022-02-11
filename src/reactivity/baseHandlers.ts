@@ -3,8 +3,6 @@ import { ReactiveFlags } from './reactive';
 
 function createGetter(isReadonly?: boolean) {
   return function get(target, key) {
-    const res = Reflect.get(target, key);
-
     // 处理isReactive调用
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly;
@@ -13,6 +11,8 @@ function createGetter(isReadonly?: boolean) {
     if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly;
     }
+
+    const res = Reflect.get(target, key);
 
     if (!isReadonly) {
       // 依赖收集

@@ -38,4 +38,22 @@ describe('readonly', () => {
     expect(isReadonly(wrapped)).toBe(true);
     expect(isReadonly(original)).toBe(false);
   });
+
+  it('isReadonly 2', () => {
+    const original = {
+      nested: {
+        foo: 1,
+      },
+      array: [{ foo: 2 }],
+    };
+
+    const wrapped = readonly(original);
+    expect(isReadonly(wrapped)).toBe(true);
+    expect(isReadonly(original)).toBe(false);
+
+    // 测试嵌套的属性
+    expect(isReadonly(wrapped.nested)).toBe(true);
+    expect(isReadonly(wrapped.array)).toBe(true);
+    expect(isReadonly(wrapped.array[0])).toBe(true);
+  });
 });

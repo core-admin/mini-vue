@@ -1,4 +1,4 @@
-import { readonly, isReadonly } from '../reactive';
+import { readonly, isReadonly, isProxy } from '../reactive';
 
 describe('readonly', () => {
   // 程序主逻辑
@@ -55,5 +55,12 @@ describe('readonly', () => {
     expect(isReadonly(wrapped.nested)).toBe(true);
     expect(isReadonly(wrapped.array)).toBe(true);
     expect(isReadonly(wrapped.array[0])).toBe(true);
+  });
+
+  // 只要是响应式变量都返回true
+  it('isProxy', () => {
+    const original = { foo: 1 };
+    const observed = readonly(original);
+    expect(isProxy(observed)).toBe(true);
   });
 });

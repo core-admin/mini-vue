@@ -1,9 +1,9 @@
 import { track, trigger } from './effect';
 import { ReactiveFlags } from './reactive';
 import { reactive, readonly } from './reactive';
-import { isObject } from '../shared/index';
+import { isObject, extend } from '../shared/index';
 
-function createGetter(isReadonly?: boolean) {
+function createGetter(isReadonly = false, isShallow = false) {
   return function get(target, key) {
     // 处理isReactive调用
     if (key === ReactiveFlags.IS_REACTIVE) {
@@ -15,6 +15,11 @@ function createGetter(isReadonly?: boolean) {
     }
 
     const res = Reflect.get(target, key);
+
+    // shallow 浅代理
+    if (isShallow) {
+      return res;
+    }
 
     // 看看 res 是不是 object
     if (isObject(res) || Array.isArray(res)) {
@@ -45,6 +50,7 @@ function createSetter() {
 const get = createGetter();
 const set = createSetter();
 const readonlyGet = createGetter(true);
+const shallowReadonlyGet = createGetter(true, true);
 
 // 当调用reactive时，没有必要每次都重新创建一次 get 与 set
 export const mutableHandles = {
@@ -59,3 +65,8 @@ export const readonlyHandles = {
     return true;
   },
 };
+
+// shallowReadonlyHandles的set与readonlyHandles的set一致
+export const shallowReadonlyHandles = extend({}, readonlyHandles, {
+  get: shallowReadonlyGet,
+});

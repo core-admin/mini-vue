@@ -1,6 +1,6 @@
 import { effect } from '../effect';
 import { reactive } from '../reactive';
-import { ref, isRef, unRef } from '../ref';
+import { ref, isRef, unRef, proxyRefs } from '../ref';
 
 describe('ref', () => {
   // it.only 只先执行当前测试用例
@@ -64,5 +64,36 @@ describe('ref', () => {
     const a = ref(1);
     expect(unRef(a)).toBe(1);
     expect(unRef(1)).toBe(1);
+  });
+
+  it('proxyRefs', () => {
+    const user = {
+      age: ref(10),
+      name: 'xx1',
+    };
+    const proxyUser = proxyRefs(user);
+
+    expect(user.age.value).toBe(10);
+    // 经过proxyRefs包装过的值 在访问里面存在ref类型值时 可以直接取到 不需要.value的形式去取
+    expect(proxyUser.age).toBe(10);
+    expect(proxyUser.name).toBe('xx1');
+
+    // 使用场景为在template里 使用为ref变量类型的值时 是不需要.value 进行调用读取的 -> proxyRefs
+
+    // age -> ref ? 返回.value : 返回本身值
+
+    // --------- 以上为 get test --------------
+
+    // --------- 以下为 set test --------------
+
+    proxyUser.age = 20;
+    expect(proxyUser.age).toBe(20);
+    expect(user.age.value).toBe(20);
+
+    proxyUser.age = ref(30);
+    expect(proxyUser.age).toBe(30);
+    expect(user.age.value).toBe(30);
+
+    // set -> ref -> .value
   });
 });

@@ -86,6 +86,23 @@ export function unRef(ref) {
   return isRef(ref) ? ref.value : ref;
 }
 
+export function proxyRefs(objectWithRefs) {
+  return new Proxy(objectWithRefs, {
+    get(target, key) {
+      return unRef(Reflect.get(target, key));
+    },
+    set(target, key, value) {
+      const res = Reflect.get(target, key);
+      // 如果之前的值就是一个ref类型，修改的值不是一个ref类型，直接替换
+      if (isRef(res) && !isRef(value)) {
+        // return (val.value = value);
+        return Reflect.set(res, 'value', value);
+      }
+      return Reflect.set(target, key, value);
+    },
+  });
+}
+
 /**
  * es6 Class get set 拓展说明
  *

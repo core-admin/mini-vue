@@ -59,8 +59,19 @@ function clearupEffect(effect) {
 // 存储依赖的容器 target -> key -> dep
 const targetMaps = new Map();
 
-function isTracking() {
+export function isTracking() {
   return shouldTrack && activeEffect !== undefined;
+}
+
+export function trackEffects(dep: Set<any>) {
+  if (dep.has(activeEffect)) {
+    return;
+  }
+
+  // dep对应Set 而Set身上存储的是ReactiveEffect的实例
+  dep.add(activeEffect);
+  // 反向收集依赖 给stop使用
+  activeEffect.deps.push(dep);
 }
 
 export function track(target, key) {
@@ -84,19 +95,10 @@ export function track(target, key) {
     targetMapValue.set(key, dep);
   }
 
-  if (dep.has(activeEffect)) {
-    return;
-  }
-
-  // dep对应Set 而Set身上存储的是ReactiveEffect的实例
-  dep.add(activeEffect);
-  activeEffect && activeEffect.deps.push(dep);
+  trackEffects(dep);
 }
 
-export function trigger(target, key) {
-  let targetMapValue = targetMaps.get(target);
-  let dep = targetMapValue.get(key);
-
+export function triggerEffects(dep: Set<any>) {
   // effect -> ReactiveEffect
   for (const effect of dep) {
     if (effect.scheduler) {
@@ -105,6 +107,12 @@ export function trigger(target, key) {
       effect.run();
     }
   }
+}
+
+export function trigger(target, key) {
+  let targetMapValue = targetMaps.get(target);
+  let dep = targetMapValue.get(key);
+  triggerEffects(dep);
 }
 
 // stop的调用，就是将收集的effect函数删除掉

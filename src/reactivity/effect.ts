@@ -1,14 +1,6 @@
-// shaded 模块是 所有模块下的通用工具函数
-import { extend } from '../shared/index';
+import { extend } from '../shared';
 
 let activeEffect;
-
-// 是否应该收集依赖 其实只有运用effect函数和收集的依赖才有用 因为set时会调用收集的fn
-// 默认不收集 只有effect函数执行时才会把当前状态改成true（此时应该收集依赖）
-// 也就是说 track收集依赖的场景适应于 effect被使用的情况下，因为只使用reactive时访问属性被get然后收集依赖是没必要的，收集的依赖就是effect传入的fn
-
-// 当执行stop后，访问reactive包装过的属性时不应该再次收集依赖了（shouldTrack = false）
-// stop后，每次去修改属性时即便先get 也不会收集了
 let shouldTrack;
 
 type Fn<T = any> = () => T;
@@ -68,24 +60,9 @@ function clearupEffect(effect) {
 const targetMaps = new Map();
 
 function isTracking() {
-  // ------ 一版 ----------
-
-  // 只有effect调用时 activeEffect才会存在
-  // if (!activeEffect) {
-  //   return false;
-  // }
-
-  // // 用来控制是否需要收集依赖
-  // if (!shouldTrack) {
-  //   return false;
-  // }
-
-  // --------- 二版 ---------
-
   return shouldTrack && activeEffect !== undefined;
 }
 
-// getter 访问值时 收集依赖
 export function track(target, key) {
   if (!isTracking()) {
     return;
@@ -101,35 +78,21 @@ export function track(target, key) {
   }
 
   let dep = targetMapValue.get(key);
-  // 初始化时也没有
+
   if (!dep) {
-    // 没有就需要初始化
-    // dep的值为一个set的目的是防止在一个effect回调函数中 访问变量造成多次收集依赖时存储多个相同的effect回调函数
     dep = new Set();
     targetMapValue.set(key, dep);
   }
 
-  // 看看 dep 之前有没有添加过，添加过的话 那么就不添加了
   if (dep.has(activeEffect)) {
     return;
   }
 
   // dep对应Set 而Set身上存储的是ReactiveEffect的实例
   dep.add(activeEffect);
-
-  // 反向收集依赖 供ReactiveEffect实例的stop方法调用 方便获取收集到的dep
-  // activeEffect -> ReactiveEffect的实例
-
-  // activeEffect && activeEffect.deps.push(dep);
-
-  // 优化 当deps是一个数组时，进行收集dep 会存在多次收集相同的dep 浪费空间
-  // activeEffect.deps.add(dep);
-
-  // 不在优化：引用【1】
   activeEffect && activeEffect.deps.push(dep);
 }
 
-// setter 修改值时 触发依赖
 export function trigger(target, key) {
   let targetMapValue = targetMaps.get(target);
   let dep = targetMapValue.get(key);
@@ -209,18 +172,3 @@ export function effect(fn: () => void, options: any = {}) {
 
   stop 执行 应该先取到对应的dep中的Set对象，然后删除Set中存储的dep
 */
-
-/*
-  引用【1】：
-    说明：之前deps的收集使用了Array集合，而后发现会收集很多次重复的数据故改成了Set，现在又改回来了故对以上操作做出说明
-
-    就当前实现的逻辑来看用 Set 也 ok
-
-    不过性能上 array 要比 set 更快
-
-    （这个是性能比较的文章： https://stackoverflow.com/questions/39007637/javascript-set-vs-array-performance）
-
-    在 vue3 源码中 ，很多的实现都特别注重性能
-
-    而且在源码里面是需要获取 deps 的某个索引的， 用 set 的话就不行了
- */

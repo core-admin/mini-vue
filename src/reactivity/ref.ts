@@ -15,6 +15,7 @@ import { hasChanged, isObject } from '../shared';
 class RefImpl {
   private _value: any;
   private _rawValue: any;
+  public __v_isRef = true;
 
   // 因为只有一个值 value 所以只需要存储一个dep即可
   // key（value） -> dep -> Set(fn1, fn2, fn3...)
@@ -75,6 +76,14 @@ function convert(value) {
 
 export function ref(value) {
   return new RefImpl(value);
+}
+
+export function isRef(ref) {
+  return !!ref?.__v_isRef;
+}
+
+export function unRef(ref) {
+  return isRef(ref) ? ref.value : ref;
 }
 
 /**

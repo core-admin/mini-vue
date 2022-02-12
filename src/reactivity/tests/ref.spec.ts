@@ -1,6 +1,6 @@
 import { effect } from '../effect';
 import { reactive } from '../reactive';
-import { ref } from '../ref';
+import { ref, isRef, unRef } from '../ref';
 
 describe('ref', () => {
   // it.only 只先执行当前测试用例
@@ -47,5 +47,22 @@ describe('ref', () => {
     a.value.count = 2;
     // 如果ref传递的是一个对象类型的值 还需要转成reactive
     expect(dummy).toBe(2);
+  });
+
+  it('isRef', () => {
+    const a = ref(1);
+    const user = reactive({
+      age: 1,
+    });
+    expect(isRef(a)).toBe(true);
+    expect(isRef(1)).toBe(false);
+    expect(isRef(true)).toBe(false);
+    expect(isRef(user)).toBe(false);
+  });
+
+  it('unRef', () => {
+    const a = ref(1);
+    expect(unRef(a)).toBe(1);
+    expect(unRef(1)).toBe(1);
   });
 });

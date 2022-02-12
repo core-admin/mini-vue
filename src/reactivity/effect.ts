@@ -5,7 +5,7 @@ let shouldTrack;
 
 type Fn<T = any> = () => T;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   // effect 的回调函数 由用户传递进来
   private _fn: Fn;
 

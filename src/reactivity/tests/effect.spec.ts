@@ -189,6 +189,7 @@ describe('effect', () => {
     );
 
     stop(runner);
+    // toBeCalledTimes 测试函数被调用的次数 它的次数是随着函数被调用而累加的，也就是说 如果我之前调用过两次，我下一次在调用，此时toBeCalledTimes的值（被调用的次数）应该是3
     expect(onStop).toBeCalledTimes(1);
   });
 });

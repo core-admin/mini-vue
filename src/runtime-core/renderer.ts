@@ -8,7 +8,7 @@ export function render(vnode, container) {
 function patch(vnode, container) {
   // 去处理组件
 
-  // 判断是否是element
+  // 判断vnode是否是element 如果是 处理element，不是 那就是component类型
 
   processComponent(vnode, container);
 }
@@ -31,5 +31,5 @@ function setupRenderEffect(instance, container) {
 
   // 当返回subTree后再次它里面的虚拟节点 需要调用 patch
   // vnode -> element -> mount
-  patch(subTree, container);
+  // patch(subTree, container);
 }

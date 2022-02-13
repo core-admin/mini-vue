@@ -90,3 +90,22 @@ module.exports = {
 ```
 
 TDD: 先写测试代码，然后让测试用例通过，最后在重构优化代码。
+
+rollup 打包：
+
+`"build": "rollup -c rollup.config.js"`
+
+`-c` 指定其配置文件
+
+package.json
+
+```javascript
+{
+  "name": "mini-vue",
+  "version": "1.0.0",
+  // cjs -> main.js
+  // esm -> module
+  "main": "lib/guide-mini-vue.cjs.js",
+  "module": "lib/guide-mini-vue.esm.js",
+}
+```

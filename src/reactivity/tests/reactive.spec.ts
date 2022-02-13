@@ -35,4 +35,10 @@ describe('reactive', () => {
     const observed = reactive(original);
     expect(isProxy(observed)).toBe(true);
   });
+
+  it('test', () => {
+    const observed = reactive({ foo: 1 });
+    // TODO: 待解决
+    // observed.foo++;
+  });
 });

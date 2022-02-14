@@ -182,3 +182,7 @@ package.json
  *    -> Object
  */
 ```
+
+删除提交到的 git 的 lib 文件夹
+
+`git rm -r --cached lib`

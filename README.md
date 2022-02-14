@@ -109,3 +109,76 @@ package.json
   "module": "lib/guide-mini-vue.esm.js",
 }
 ```
+
+扩展：
+
+```javascript
+/**
+ * dom的节点类
+ *
+ * 1.document -> Document 节点 nodeType = 9
+ *    -> HTMLDocument
+ *    -> Document
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 2.document.documentElement -> html
+ *    -> HTMLHtmlElement
+ *    -> HTMLElement
+ *    -> Element
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 3.document.body
+ *    -> HTMLBodyElement
+ *    -> HTMLElement
+ *    -> Element
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 4.div
+ *    -> HTMLDivElement
+ *    -> HTMLElement
+ *    -> Element
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 5.span
+ *    -> HTMLSpanElement
+ *    -> HTMLElement
+ *    -> Element
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 6.img
+ *    -> HTMLImageElement
+ *    -> HTMLElement
+ *    -> Element
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * ------------------- 以上为元素节点 nodeType = 1
+ *
+ * 7.注释节点 Comment -> document.createComment('xxx') -> nodeType = 8
+ *    -> Comment
+ *    -> CharacterData
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ *
+ * 8.文本节点 -> Element或者Attr中实际的文字
+ *   document.createTextNode('xxx') -> nodeType = 3
+ *
+ *    -> Text
+ *    -> CharacterData
+ *    -> Node
+ *    -> EventTarget
+ *    -> Object
+ */
+```

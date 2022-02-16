@@ -1,5 +1,7 @@
 import { h } from '../../lib/guide-mini-vue.esm.js';
 
+window.self = null;
+
 export const App = {
   setup() {
     return {
@@ -8,6 +10,9 @@ export const App = {
     };
   },
   render() {
+    window.self = this;
+    // setupState
+    // this.$el api -> 返回根节点
     return h(
       'h1',
       {

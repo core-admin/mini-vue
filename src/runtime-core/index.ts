@@ -2,17 +2,6 @@ export { createApp } from './createApp';
 export { h } from './h';
 
 /*
-  instance:
-
-  const component = {
-    vnode,
-    type: vnode.type,
-    render: -> Component (instance.type) .render
-    setupState: -> Component.setup()
-  };
-*/
-
-/*
   vnode:
 
   const vnode = {
@@ -22,5 +11,18 @@ export { h } from './h';
     props,
     // children -> string | array
     children,
+    挂载的dom节点对象
+    el: null
+  };
+*/
+
+/*
+  instance:
+
+  const component = {
+    vnode,
+    type: vnode.type,
+    render: -> Component (instance.type) .render,
+    setupState: -> Component.setup(),
   };
 */

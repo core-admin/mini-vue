@@ -1,4 +1,5 @@
 import { isObject } from '../shared';
+import { publicInstanceProxyHandlers } from './componentPublicInstance';
 
 export function createComponentInstance(vnode) {
   const component = {
@@ -24,16 +25,10 @@ function setupStatefulComponent(instance) {
 
   // 先给一个空对象 ctx
   instance.proxy = new Proxy(
-    {},
     {
-      get(target, key) {
-        const { setupState } = instance;
-        // 先只实现从setupState中获取值
-        if (key in setupState) {
-          return setupState[key];
-        }
-      },
+      _: instance,
     },
+    publicInstanceProxyHandlers,
   );
 
   const { setup } = Component;

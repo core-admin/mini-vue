@@ -6,6 +6,8 @@ export function createVNode(type, props?, children?) {
     props,
     // children -> string | array
     children,
+    // 挂载的dom节点对象
+    el: null,
   };
   return vnode;
 }

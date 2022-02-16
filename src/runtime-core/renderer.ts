@@ -27,7 +27,8 @@ function processElement(vnode, container) {
 
 function mountElement(vnode, container) {
   const { type, props, children } = vnode;
-  const el = document.createElement(type) as HTMLElement;
+  // 存储挂载节点
+  const el = (vnode.el = document.createElement(type) as HTMLElement);
 
   if (typeof children === 'string') {
     el.textContent = children;
@@ -57,21 +58,25 @@ function processComponent(vnode, container) {
 }
 
 // 初始化component
-function mountComponent(vnode, container) {
-  const instance = createComponentInstance(vnode);
+function mountComponent(initialVNode, container) {
+  const instance = createComponentInstance(initialVNode);
 
   setupComponent(instance);
 
-  setupRenderEffect(instance, container);
+  setupRenderEffect(instance, initialVNode, container);
 }
 
-function setupRenderEffect(instance, container) {
+function setupRenderEffect(instance, initialVNode, container) {
   const { proxy } = instance;
   // vnode
   const subTree = instance.render.call(proxy);
-  console.log(subTree);
 
   // 当返回subTree后再次它里面的虚拟节点 需要调用 patch
   // vnode -> element -> mount
   patch(subTree, container);
+
+  // element类型 mount后
+  // 可以确定所有的element已被处理完成
+  // el的获取需要等待element都初始化完成后才有
+  initialVNode.el = subTree.el;
 }

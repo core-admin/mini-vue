@@ -66,8 +66,9 @@ function mountComponent(vnode, container) {
 }
 
 function setupRenderEffect(instance, container) {
+  const { proxy } = instance;
   // vnode
-  const subTree = instance.render();
+  const subTree = instance.render.call(proxy);
   console.log(subTree);
 
   // 当返回subTree后再次它里面的虚拟节点 需要调用 patch

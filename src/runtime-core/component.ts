@@ -4,6 +4,7 @@ export function createComponentInstance(vnode) {
   const component = {
     vnode,
     type: vnode.type,
+    setupState: {},
   };
 
   return component;
@@ -20,6 +21,20 @@ export function setupComponent(instance) {
 // 调用 setup 拿到其返回值
 function setupStatefulComponent(instance) {
   const Component = instance.type;
+
+  // 先给一个空对象 ctx
+  instance.proxy = new Proxy(
+    {},
+    {
+      get(target, key) {
+        const { setupState } = instance;
+        // 先只实现从setupState中获取值
+        if (key in setupState) {
+          return setupState[key];
+        }
+      },
+    },
+  );
 
   const { setup } = Component;
 
